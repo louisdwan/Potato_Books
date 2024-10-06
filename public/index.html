@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Potato Books</title>
+    <link rel="stylesheet" href="resources/index.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">
+                <img src="./resources/images/DALL·E 2024-10-06 14.28.28 - A playful and animated potato character with a cute, smiling face, wearing reading glasses, holding a book, and jumping with joy. The scene should hav.webp" alt="Potato Books Logo">
+                <h1>Potato Books</h1>
+            </div>
+            <ul>
+                <li><a href="#home">Home</a></li>
+                <li><a href="#genres">Genres</a></li>
+                <li><a href="#top-stories">Top Stories</a></li>
+                <li><a href="#login">Login</a></li>
+            </ul>
+            <form id="search-form" class="search-bar">
+                <input type="text" id="search-query" placeholder="Search for books..." required>
+                <button type="submit">Search</button>
+            </form>
+        </nav>
+        <div class="writer-banner" onclick="openWriterLogin()">
+            <p>Become a Writer! Share your stories with the world.</p>
+        </div>
+    </header>
+    
+
+    </header>
+
+    <section id="home" class="content-section">
+        <h1>Welcome to Potato Books</h1>
+        <p>Discover thousands of free novels from every genre. Start reading now with your favorite potato companion!</p>
+    </section>
+
+    <section id="genres" class="content-section">
+        <h2>Genres</h2>
+        <div class="genre-list">
+            <div class="genre-item">Fantasy</div>
+            <div class="genre-item">Romance</div>
+            <div class="genre-item">Sci-Fi</div>
+            <div class="genre-item">LGBTQ+</div>
+        </div>
+    </section>
+
+    <section id="top-stories" class="content-section">
+        <h2>Top Stories</h2>
+        <div id="book-list">
+            <!-- Dynamic book list will be inserted here -->
+        </div>
+        <button onclick="loadBooks()">Load Books</button>
+    </section>
+
+    <section id="login" class="content-section">
+        <h2>Login</h2>
+        <form id="login-form">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+            <br>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+            <br>
+            <button type="submit">Login</button>
+        </form>
+        <p id="login-status"></p>
+    </section>
+
+    <footer>
+        <p>&copy; 2024 Potato Books. All rights reserved.</p>
+    </footer>
+
+    <script src="../index.js"></script>
+</body>
+</html>
