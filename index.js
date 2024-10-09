@@ -43,5 +43,9 @@ function openWriterLogin() {
 }
 
 function loginWithGoogle() {
-    window.location.href = 'https://accounts.google.com/signin'; // Mock Google login URL
+    window.location.href = 'https://accounts.google.com/signin'; // Use Google OAuth URL
+}
+
+function loginWithFacebook() {
+    window.location.href = 'https://www.facebook.com/login.php'; // Use Facebook OAuth URL
 }

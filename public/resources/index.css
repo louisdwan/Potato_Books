@@ -182,3 +182,30 @@ h1 {
 .hidden {
     display: none;
 }
+
+#account {
+    text-align: center;
+    padding: 2rem;
+}
+
+button {
+    padding: 10px 15px;
+    background-color: #4267B2; /* Facebook blue */
+    color: white;
+    border: none;
+    cursor: pointer;
+    margin: 5px;
+}
+
+button:hover {
+    background-color: #365899; /* Darker blue on hover */
+}
+
+button:nth-child(2) {
+    background-color: #DB4437; /* Google red */
+}
+
+button:nth-child(2):hover {
+    background-color: #C33D2E; /* Darker Google red on hover */
+}
+

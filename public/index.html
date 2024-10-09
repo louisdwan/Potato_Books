@@ -16,7 +16,7 @@
             <ul>
                 <li><a href="#home">Home</a></li>
                 <li><a href="#genres">Genres</a></li>
-                <li><a href="#login">Login</a></li>
+                <li><a href="#account">Account</a></li>
             </ul>
             <form id="search-form" class="search-bar">
                 <input type="text" id="search-query" placeholder="Search for books..." required>
@@ -54,18 +54,10 @@
         <button onclick="loadBooks()">Load Books</button>
     </section>
 
-    <section id="login" class="content-section">
-        <h2>Login</h2>
-        <form id="login-form">
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="username" required>
-            <br>
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required>
-            <br>
-            <button type="submit">Login</button>
-        </form>
-        <p id="login-status"></p>
+    <section id="account" class="content-section">
+        <h2>Login using Social Media</h2>
+        <button onclick="loginWithGoogle()">Login with Google</button>
+        <button onclick="loginWithFacebook()">Login with Facebook</button>
     </section>
 
     <footer>
