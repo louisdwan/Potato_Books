@@ -12,9 +12,10 @@ function loadBooks() {
     books.forEach(book => {
         const bookItem = document.createElement('div');
         bookItem.className = 'book-item';
-        bookItem.innerHTML = `<strong>${book.title}</strong> - ${book.genre} by ${book.author}`;
+        bookItem.innerHTML = `<a href="reader.html?bookId=${book.id}">${book.title} - ${book.genre} by ${book.author}</a>`;
         bookList.appendChild(bookItem);
     });
+    
 }
 
 // Simulate login functionality
