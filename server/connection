@@ -1,0 +1,9 @@
+const connection = snowflake.createConnection({
+  account: 'tu31985.europe-west2.gcp',
+  username: 'louisdwan',
+  password: 'Ro3kwell1234$',
+  warehouse: 'COMPUTE_WH',
+  database: 'POTATOBOOKS',
+  schema: 'POTATOSCHEMA',
+  role: 'ACCOUNTADMIN'
+});
