@@ -23,12 +23,13 @@ document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('book-details').textContent = "Error loading book details.";
         });
 
-    // Display the book details (ID, Title, Summary, Page Count)
+    // Display the book details (ID, Title, Summary, Page Count, View Count)
     function displayBookDetails(book) {
         document.getElementById('book-id').textContent = `Book ID: ${book.BOOK_ID}`;
         document.getElementById('book-title').textContent = `Title: ${book.TITLE}`;
         document.getElementById('book-summary').textContent = `Summary: ${book.SUMMARY}`;
         document.getElementById('book-page-count').textContent = `Page Count: ${book.PAGE_COUNT}`;
+        document.getElementById('book-view-count').textContent = `Views: ${book.VIEW_COUNT}`; // Display the view count
     }
 
     // Load a specific page's content

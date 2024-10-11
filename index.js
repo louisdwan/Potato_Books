@@ -1,7 +1,7 @@
 function loadBooks() {
     const bookList = document.getElementById('book-list');
 
-    // Fetch the first 3 books from the backend
+    // Fetch the books from the backend
     fetch('http://localhost:5000/books')
         .then(response => response.json())
         .then(books => {

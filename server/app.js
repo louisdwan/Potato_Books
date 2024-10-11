@@ -3,6 +3,7 @@ const snowflake = require('snowflake-sdk');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 
+
 const app = express();
 app.use(bodyParser.json());
 app.use(cors());
@@ -64,22 +65,49 @@ app.post('/books', (req, res) => {
   });
 });
 
+// Fetch book details and increment view count
 app.get('/book/:bookId', (req, res) => {
   const bookId = req.params.bookId;
-  const sql = `SELECT BOOK_ID, TITLE, SUMMARY, PAGE_COUNT FROM BOOKS WHERE BOOK_ID = ?`;
 
+  // SQL query to increment the view count
+  const incrementViewCountSQL = `
+    UPDATE BOOKS
+    SET VIEW_COUNT = VIEW_COUNT + 1
+    WHERE BOOK_ID = ?
+  `;
+
+  // Execute the query to increment the view count
   connection.execute({
-      sqlText: sql,
-      binds: [bookId],
-      complete: function (err, stmt, rows) {
-          if (err) {
-              res.status(500).json({ message: 'Error retrieving book details' });
-          } else if (rows.length > 0) {
-              res.json(rows[0]);
-          } else {
-              res.status(404).json({ message: 'Book not found' });
-          }
+    sqlText: incrementViewCountSQL,
+    binds: [bookId],
+    complete: function (err, stmt) {
+      if (err) {
+        console.error('Error updating view count:', err);
+        res.status(500).json({ message: 'Error updating view count' });
+        return;
       }
+
+      // After incrementing the view count, fetch the book details
+      const fetchBookDetailsSQL = `
+        SELECT BOOK_ID, TITLE, SUMMARY, PAGE_COUNT, VIEW_COUNT
+        FROM BOOKS
+        WHERE BOOK_ID = ?
+      `;
+
+      connection.execute({
+        sqlText: fetchBookDetailsSQL,
+        binds: [bookId],
+        complete: function (err, stmt, rows) {
+          if (err) {
+            res.status(500).json({ message: 'Error retrieving book details' });
+          } else if (rows.length > 0) {
+            res.json(rows[0]);
+          } else {
+            res.status(404).json({ message: 'Book not found' });
+          }
+        }
+      });
+    }
   });
 });
 
