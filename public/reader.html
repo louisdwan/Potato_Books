@@ -3,18 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Book Reader</title>
-    <link rel="stylesheet" href="resources/index.css">
+    <title>Reader - Potato Books</title>
+    <link rel="stylesheet" href="./resources/reader.css"> <!-- Linking the main CSS file -->
 </head>
 <body>
     <header>
-        <h1 id="book-title">Book Title</h1>
+        <h1 id="book-title">Title: The Book Title</h1>
     </header>
 
-    <section id="book-content">
-        <p id="book-paragraph"></p>
+    <section class="content-section" id="book-details">
+        <p id="book-id"></p>
+        <p id="book-summary"></p>
+        <p id="book-page-count"></p>
     </section>
 
-    <script src="reader.js"></script>
+    <section class="content-section" id="page-reader">
+        <h3 id="page-number">Page 1</h3>
+        <div id="page-content" class="page-content-box"></div>
+
+        <!-- Navigation buttons for previous and next pages -->
+        <div class="navigation-buttons">
+            <button id="prev-page">Previous Page</button>
+            <button id="next-page">Next Page</button>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2024 Potato Books. All rights reserved.</p>
+    </footer>
+
+    <script src="/reader.js"></script>
 </body>
 </html>

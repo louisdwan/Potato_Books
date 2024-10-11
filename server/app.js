@@ -29,7 +29,7 @@ connection.connect((err, conn) => {
 
 // Fetch books from Snowflake
 app.get('/books', (req, res) => {
-  const sql = `SELECT BOOK_ID, TITLE, PUBLISHED_YEAR FROM BOOKS LIMIT 3`;
+  const sql = `SELECT BOOK_ID, TITLE, PUBLISHED_YEAR FROM BOOKS`;
 
   connection.execute({
       sqlText: sql,
@@ -64,19 +64,42 @@ app.post('/books', (req, res) => {
   });
 });
 
-app.get('/book/:id', (req, res) => {
-  const bookId = parseInt(req.params.id, 10);
-  const books = {
-      1: { title: "The Dragon's Call", content: "This is the full content of The Dragon's Call..." },
-      2: { title: "Heartstrings", content: "This is the full content of Heartstrings..." }
-  };
+app.get('/book/:bookId', (req, res) => {
+  const bookId = req.params.bookId;
+  const sql = `SELECT BOOK_ID, TITLE, SUMMARY, PAGE_COUNT FROM BOOKS WHERE BOOK_ID = ?`;
 
-  const book = books[bookId];
-  if (book) {
-      res.json(book);
-  } else {
-      res.status(404).json({ message: 'Book not found.' });
-  }
+  connection.execute({
+      sqlText: sql,
+      binds: [bookId],
+      complete: function (err, stmt, rows) {
+          if (err) {
+              res.status(500).json({ message: 'Error retrieving book details' });
+          } else if (rows.length > 0) {
+              res.json(rows[0]);
+          } else {
+              res.status(404).json({ message: 'Book not found' });
+          }
+      }
+  });
+});
+
+app.get('/book/:bookId/page/:pageNumber', (req, res) => {
+  const { bookId, pageNumber } = req.params;
+  const sql = `SELECT PAGE_NUMBER, CONTENT FROM BOOK_PAGES WHERE BOOK_ID = ? AND PAGE_NUMBER = ?`;
+
+  connection.execute({
+      sqlText: sql,
+      binds: [bookId, pageNumber],
+      complete: function (err, stmt, rows) {
+          if (err) {
+              res.status(500).json({ message: 'Error retrieving page content' });
+          } else if (rows.length > 0) {
+              res.json(rows[0]);
+          } else {
+              res.status(404).json({ message: 'Page not found' });
+          }
+      }
+  });
 });
 
 // Start the server
