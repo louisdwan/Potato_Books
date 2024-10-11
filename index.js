@@ -1,35 +1,25 @@
-// Simulate dynamic book loading
 function loadBooks() {
     const bookList = document.getElementById('book-list');
-    const books = [
-        { title: "The Dragon's Call", genre: "Fantasy", author: "A. Knight" },
-        { title: "Heartstrings", genre: "Romance", author: "E. Love" },
-        { title: "Galaxy Wars", genre: "Sci-Fi", author: "Z. Star" },
-        { title: "Rainbow Tales", genre: "LGBTQ+", author: "J. Pride" }
-    ];
 
-    bookList.innerHTML = ''; // Clear existing content
-    books.forEach(book => {
-        const bookItem = document.createElement('div');
-        bookItem.className = 'book-item';
-        bookItem.innerHTML = `<a href="reader.html?bookId=${book.id}">${book.title} - ${book.genre} by ${book.author}</a>`;
-        bookList.appendChild(bookItem);
-    });
-    
+    // Fetch the first 3 books from the backend
+    fetch('http://localhost:5000/books')
+        .then(response => response.json())
+        .then(books => {
+            bookList.innerHTML = ''; // Clear the book list before adding new content
+
+            books.forEach(book => {
+                const bookItem = document.createElement('div');
+                bookItem.className = 'book-item';
+                // Display the book title and published year, hyperlink to reader.html with the bookId
+                bookItem.innerHTML = `<a href="reader.html?bookId=${book.BOOK_ID}">${book.TITLE} (${book.PUBLISHED_YEAR})</a>`;
+                bookList.appendChild(bookItem);
+            });
+        })
+        .catch(error => {
+            console.error('Error loading books:', error);
+        });
 }
 
-// Simulate login functionality
-document.getElementById('login-form').addEventListener('submit', function(event) {
-    event.preventDefault();
-    const username = document.getElementById('username').value;
-    const password = document.getElementById('password').value;
-
-    if (username === 'user' && password === 'password123') {
-        document.getElementById('login-status').textContent = 'Login successful!';
-    } else {
-        document.getElementById('login-status').textContent = 'Invalid username or password.';
-    }
-});
 document.getElementById('search-form').addEventListener('submit', function(event) {
     event.preventDefault();
     const searchQuery = document.getElementById('search-query').value;

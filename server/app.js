@@ -29,19 +29,18 @@ connection.connect((err, conn) => {
 
 // Fetch books from Snowflake
 app.get('/books', (req, res) => {
-  const sql = `SELECT title, genre, author FROM books`;
-  
+  const sql = `SELECT BOOK_ID, TITLE, PUBLISHED_YEAR FROM BOOKS LIMIT 3`;
+
   connection.execute({
-    sqlText: sql,
-    complete: function (err, stmt, rows) {
-      if (err) {
-        console.error('Failed to execute statement due to error:', err);
-        res.status(500).json({ message: 'Error retrieving books' });
-      } else {
-        console.log('Books retrieved:', rows);
-        res.json(rows);
+      sqlText: sql,
+      complete: function (err, stmt, rows) {
+          if (err) {
+              console.error('Error retrieving books:', err);
+              res.status(500).json({ message: 'Error retrieving books' });
+          } else {
+              res.json(rows);
+          }
       }
-    }
   });
 });
 
