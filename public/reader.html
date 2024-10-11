@@ -7,16 +7,31 @@
     <link rel="stylesheet" href="./resources/reader.css"> <!-- Linking the main CSS file -->
 </head>
 <body>
+    <!-- Include the header and navigation bar from index.html -->
     <header>
-        <h1 id="book-title">Title: The Book Title</h1>
+        <nav>
+            <div class="logo">
+                <img src="./resources/images/DALL·E 2024-10-06 14.28.28 - A playful and animated potato character with a cute, smiling face, wearing reading glasses, holding a book, and jumping with joy. The scene should hav.webp" alt="Potato Books Logo">
+                <h1>Potato Books</h1>
+            </div>
+            <ul>
+                <li><a href="./index.html">Home</a></li>
+                <li><a href="#genres">Genres</a></li>
+                <li><a href="#account">Account</a></li>
+            </ul>
+            <form id="search-form" class="search-bar">
+                <input type="text" id="search-query" placeholder="Search for books..." required>
+                <button type="submit">Search</button>
+            </form>
+        </nav>
     </header>
 
-    <section id="book-details">
+    <section id="book-details" class="details-box">
+        <h2 id="book-title">Title: The Book Title</h2> <!-- Move title here -->
         <p id="book-id"></p>
-        <p id="book-title"></p>
         <p id="book-summary"></p>
         <p id="book-page-count"></p>
-        <p id="book-view-count"></p> <!-- New element for displaying the view count -->
+        <p id="book-view-count"></p> <!-- Element for displaying the view count -->
     </section>
 
     <section class="content-section" id="page-reader">

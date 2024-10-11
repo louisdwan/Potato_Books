@@ -1,28 +1,110 @@
-#book-title {
+/* Header Styling */
+header {
+    background-color: #333;
+    color: white;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column; /* Stack elements vertically */
+    align-items: center; /* Center content horizontally */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%; /* Make header span full width */
+}
+
+nav {
+    display: flex;
+    justify-content: space-between; /* Spread the items across the header */
+    width: 100%; /* Full width navigation */
+    max-width: 1200px; /* Set a max width for better layout on larger screens */
+    align-items: center;
+    padding: 0 2rem; /* Add padding for better spacing */
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.logo img {
+    width: 50px;
+    height: 50px;
+}
+
+h1 {
     font-size: 2rem;
-    font-weight: bold;
     text-align: center;
-    margin-bottom: 1rem;
+    margin-top: 1rem; /* Space between navigation and title */
+    color: white;
+    background-color: #333;
+    width: 100%;
+}
+
+/* Navigation and Search Bar */
+nav ul {
+    list-style-type: none;
+    display: flex;
+    gap: 15px;
+}
+
+nav ul li a {
+    color: white;
+    text-decoration: none;
+    padding: 10px;
+}
+
+.search-bar {
+    display: flex;
+    gap: 5px;
+}
+
+.search-bar input[type="text"] {
+    padding: 5px;
+    font-size: 1rem;
+}
+
+.search-bar button {
+    padding: 5px 10px;
+    background-color: #333;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.search-bar button:hover {
+    background-color: #555;
+}
+
+/* Book Details Section */
+.details-box {
+    background-color: #f1f1f1;
+    padding: 1rem;
+    margin: 1.5rem 0;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
 }
 
 #book-details p {
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     margin-bottom: 0.5rem;
 }
 
+/* Page Content Section */
 .page-content-box {
-    padding: 1rem;
-    margin: 1rem 0;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
     background-color: #f9f9f9;
     border: 1px solid #ddd;
-    border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    font-size: 1.1rem;
 }
 
+/* Navigation Buttons */
 .navigation-buttons {
     display: flex;
     justify-content: space-between;
-    margin-top: 1rem;
+    margin-top: 1.5rem;
 }
 
 .navigation-buttons button {
@@ -33,8 +115,18 @@
     border-radius: 5px;
     cursor: pointer;
     font-size: 1rem;
+    transition: background-color 0.3s ease;
 }
 
 .navigation-buttons button:hover {
     background-color: #555;
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    padding: 1rem;
+    background-color: #333;
+    color: white;
+    margin-top: 2rem;
 }

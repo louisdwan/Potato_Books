@@ -66,3 +66,7 @@
 {"level":"INFO","message":"[5:59:01.643 PM]: Trying to initialize Easy Logging"}
 {"level":"INFO","message":"[5:59:01.646 PM]: No client config file found in default directories"}
 {"level":"INFO","message":"[5:59:01.647 PM]: Easy Logging is disabled as no config has been found"}
+{"level":"INFO","message":"[7:56:05.269 PM]: Connecting to GLOBAL Snowflake domain"}
+{"level":"INFO","message":"[7:56:05.276 PM]: Trying to initialize Easy Logging"}
+{"level":"INFO","message":"[7:56:05.279 PM]: No client config file found in default directories"}
+{"level":"INFO","message":"[7:56:05.279 PM]: Easy Logging is disabled as no config has been found"}
