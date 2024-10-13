@@ -24,14 +24,14 @@ connection.connect((err, conn) => {
 // Sample book and page data
 const books = [
     {
-        title: "The Wave",
+        title: "Gangs of London",
         authorId: 1,
-        genreId: 1,
-        publishedYear: 2022,
-        summary: "A story of a man on a train.",
+        genreId: 3,
+        publishedYear: 2019,
+        summary: "A young man climbs the dangerous ranks of Londons Underworld",
         pageCount: 3,
         pages: [
-            "This is the first paragraph of the book. It introduces the main character.",
+            "`.",
             "In this chapter, the adventure begins as the knight embarks on his journey.",
             "As the journey continues, the challenges grow greater."
         ]
