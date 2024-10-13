@@ -2,11 +2,81 @@ const express = require('express');
 const snowflake = require('snowflake-sdk');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const multer = require('multer');
+const { Storage } = require('@google-cloud/storage');
+const path = require('path');
 
 // Initialize Express app
 const app = express();
 app.use(bodyParser.json());
 app.use(cors());
+
+const storage = new Storage();
+const bucketName = 'potatobooks'; // Replace with your actual bucket name
+
+const upload = multer({
+  storage: multer.memoryStorage(), // Store file in memory for quick upload to GCS
+});
+
+app.post('/submit-book', upload.single('contentFile'), async (req, res) => {
+  try {
+      const { title, author, genre, bookContent } = req.body; // Get text fields
+      const file = req.file; // Get the uploaded file
+
+      // 1. Upload text content (bookContent) as a separate file in GCS
+      const textFileName = `${title.replace(/\s+/g, '_')}_text.txt`; // Filename for text content
+      const textBlob = storage.bucket(bucketName).file(textFileName);
+      await textBlob.save(bookContent, {
+          resumable: false,
+          contentType: 'text/plain',
+      });
+      console.log('Text content uploaded successfully.');
+
+      app.post('/submit-book', upload.single('contentFile'), async (req, res) => {
+        try {
+            const { title, author, genre, bookContent } = req.body; // Get text fields
+            const file = req.file; // Get the uploaded file
+    
+            // 1. Upload text content (bookContent) as a separate file in GCS
+            const textFileName = `${title.replace(/\s+/g, '_')}_text.txt`; // Filename for text content
+            const textBlob = storage.bucket(bucketName).file(textFileName);
+            await textBlob.save(bookContent, {
+                resumable: false,
+                contentType: 'text/plain',
+            });
+            console.log('Text content uploaded successfully.');
+    
+            // 2. If a file is uploaded, store the file in the bucket
+            if (file) {
+                const blob = storage.bucket(bucketName).file(file.originalname);
+                const blobStream = blob.createWriteStream({
+                    resumable: false,
+                });
+    
+                blobStream.on('error', (err) => {
+                    res.status(500).json({ error: 'Failed to upload file' });
+                });
+    
+                blobStream.on('finish', () => {
+                    res.status(200).json({
+                        message: 'Book submitted successfully',
+                        textFile: textFileName,
+                        uploadedFile: file.originalname,
+                    });
+                });
+    
+                blobStream.end(file.buffer);
+            } else {
+                res.status(200).json({
+                    message: 'Book submitted successfully with only text content',
+                    textFile: textFileName,
+                });
+            }
+        } catch (error) {
+            console.error('Error uploading book:', error);
+            res.status(500).json({ error: 'Failed to submit book' });
+        }
+    });
 
 // Create a Snowflake connection configuration
 const connection = snowflake.createConnection({
@@ -124,6 +194,22 @@ app.get('/book/:bookId/page/:pageNumber', (req, res) => {
         res.json(rows[0]);
       } else {
         res.status(404).json({ message: 'Page not found' });
+      }
+    }
+  });
+});
+
+app.get('/genres', (req, res) => {
+  const sql = `SELECT GENRE_ID, GENRE_NAME FROM GENRES`;
+
+  connection.execute({
+    sqlText: sql,
+    complete: function (err, stmt, rows) {
+      if (err) {
+        console.error('Error fetching genres:', err);
+        res.status(500).json({ message: 'Error fetching genres' });
+      } else {
+        res.json(rows); // Return the list of genres
       }
     }
   });

@@ -12,6 +12,8 @@
     <style>
         #editor-container {
             height: 300px;
+            background-color: white;
+            border: 1px solid #ccc;
         }
     </style>
 </head>
@@ -34,7 +36,6 @@
         </nav>
     </header>
 
-
     <h1>Submit Your Book</h1>
 
     <form id="bookForm" enctype="multipart/form-data">
@@ -45,11 +46,34 @@
         <input type="text" id="author" name="author" required><br>
 
         <label for="genre">Genre:</label>
-        <input type="text" id="genre" name="genre" required><br>
+        <select id="genre" name="genre" required>
+            <option value="">Select a genre</option>
+            <option value="1">LGBTQ+</option>
+            <option value="101">Action/Adventure</option>
+            <option value="102">Crime</option>
+            <option value="103">Romance</option>
+            <option value="104">Non-Fiction</option>
+            <option value="105">Sci-Fi</option>
+            <option value="106">Fantasy</option>
+            <option value="107">Mystery</option>
+            <option value="108">Thriller/Suspense</option>
+            <option value="109">Horror</option>
+            <option value="110">Historical Fiction</option>
+            <option value="111">Young Adult (YA)</option>
+            <option value="112">Biography/Autobiography</option>
+            <option value="113">Memoir</option>
+            <option value="114">Self-Help</option>
+            <option value="115">Dystopian</option>
+            <option value="116">Literary Fiction</option>
+            <option value="117">Graphic Novels/Comics</option>
+            <option value="118">Poetry</option>
+            <option value="119">Contemporary Fiction</option>
+            <option value="120">Classics</option>
+        </select><br>
 
         <!-- Rich Text Editor for Writing Book Content -->
         <label for="contentEditor">Write Your Book:</label>
-        <div id="editor-container"></div>
+        <div id="editor-container"></div><br>
 
         <label for="contentFile">Upload Book File (Optional):</label>
         <input type="file" id="contentFile" name="contentFile"><br>
@@ -63,7 +87,8 @@
     <script>
         // Initialize Quill editor
         var quill = new Quill('#editor-container', {
-            theme: 'snow'
+            theme: 'snow',
+            placeholder: 'Write your book here...'
         });
 
         document.getElementById('bookForm').addEventListener('submit', function(event) {
