@@ -1,0 +1,101 @@
+header {
+    background-color: #333;
+    color: white;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column; /* Stack elements vertically */
+    align-items: center; /* Center content horizontally */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%; /* Make header span full width */
+}
+
+nav {
+    display: flex;
+    justify-content: space-between; /* Spread the items across the header */
+    width: 100%; /* Full width navigation */
+    max-width: 1200px; /* Set a max width for better layout on larger screens */
+    align-items: center;
+    padding: 0 2rem; /* Add padding for better spacing */
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.logo img {
+    width: 50px;
+    height: 50px;
+}
+h1 {
+    font-size: 2rem;
+    text-align: center;
+    margin-top: 1rem; /* Space between navigation and title */
+    color: white;
+    background-color: #333;
+    width: 100%;
+}
+
+/* Navigation and Search Bar */
+nav ul {
+    list-style-type: none;
+    display: flex;
+    gap: 15px;
+}
+
+nav ul li a {
+    color: white;
+    text-decoration: none;
+    padding: 10px;
+}
+
+.search-bar {
+    display: flex;
+    gap: 5px;
+}
+
+.search-bar input[type="text"] {
+    padding: 5px;
+    font-size: 1rem;
+}
+
+.search-bar button {
+    padding: 5px 10px;
+    background-color: #333;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.search-bar button:hover {
+    background-color: #555;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+header {
+    background-color: #333;
+    color: white;
+    padding: 1rem;
+}
+
+nav ul {
+    list-style-type: none;
+    display: flex;
+    justify-content: space-around;
+}
+
+nav ul li {
+    display: inline;
+}
+
+nav ul li a {
+    color: white;
+    text-decoration: none;
+    padding: 10px;
+}

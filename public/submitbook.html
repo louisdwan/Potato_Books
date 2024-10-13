@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit a Book</title>
+    <link rel="stylesheet" href="./resources/submitbook.css">
+
+    <!-- Quill Text Editor CSS -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+
+    <style>
+        #editor-container {
+            height: 300px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">
+                <img src="./resources/images/DALL·E 2024-10-06 14.28.28 - A playful and animated potato character with a cute, smiling face, wearing reading glasses, holding a book, and jumping with joy. The scene should hav.webp" alt="Potato Books Logo">
+                <h1>Potato Books</h1>
+            </div>
+            <ul>
+                <li><a href="./index.html">Home</a></li>
+                <li><a href="#genres">Genres</a></li>
+                <li><a href="#account">Account</a></li>
+            </ul>
+            <form id="search-form" class="search-bar">
+                <input type="text" id="search-query" placeholder="Search for books..." required>
+                <button type="submit">Search</button>
+            </form>
+        </nav>
+    </header>
+
+
+    <h1>Submit Your Book</h1>
+
+    <form id="bookForm" enctype="multipart/form-data">
+        <label for="title">Title:</label>
+        <input type="text" id="title" name="title" required><br>
+
+        <label for="author">Author:</label>
+        <input type="text" id="author" name="author" required><br>
+
+        <label for="genre">Genre:</label>
+        <input type="text" id="genre" name="genre" required><br>
+
+        <!-- Rich Text Editor for Writing Book Content -->
+        <label for="contentEditor">Write Your Book:</label>
+        <div id="editor-container"></div>
+
+        <label for="contentFile">Upload Book File (Optional):</label>
+        <input type="file" id="contentFile" name="contentFile"><br>
+
+        <button type="submit">Submit Book</button>
+    </form>
+
+    <!-- Quill Text Editor JS -->
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+
+    <script>
+        // Initialize Quill editor
+        var quill = new Quill('#editor-container', {
+            theme: 'snow'
+        });
+
+        document.getElementById('bookForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            // Get the content from the Quill editor
+            const content = quill.root.innerHTML;
+
+            const formData = new FormData();
+            formData.append('title', document.getElementById('title').value);
+            formData.append('author', document.getElementById('author').value);
+            formData.append('genre', document.getElementById('genre').value);
+            formData.append('content', content); // Add the Quill editor content
+            formData.append('contentFile', document.getElementById('contentFile').files[0]);
+
+            fetch('http://localhost:5000/uploadBook', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message === 'Book uploaded successfully') {
+                    alert('Book uploaded successfully!');
+                } else {
+                    alert('Error uploading book');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while submitting the book');
+            });
+        });
+    </script>
+</body>
+</html>
