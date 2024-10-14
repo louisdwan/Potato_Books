@@ -164,7 +164,7 @@ app.get('/book/:bookId', (req, res) => {
       }
 
       const fetchBookDetailsSQL = `
-        SELECT BOOK_ID, TITLE, SUMMARY, PAGE_COUNT, VIEW_COUNT
+        SELECT BOOK_ID, TITLE, AUTHOR, GENRE_ID, SUMMARY, CONTENT_URL, PUBLISHED_YEAR, VIEW_COUNT
         FROM BOOKS
         WHERE BOOK_ID = ?
       `;
