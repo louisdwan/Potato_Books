@@ -1,0 +1,8 @@
+[
+    {
+      "origin": ["*"],  // Adjust this to restrict to your domain
+      "method": ["GET"],
+      "responseHeader": ["Content-Type"],
+      "maxAgeSeconds": 3600
+    }
+  ]
