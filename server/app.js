@@ -11,72 +11,80 @@ const app = express();
 app.use(bodyParser.json());
 app.use(cors());
 
-const storage = new Storage();
-const bucketName = 'potatobooks'; // Replace with your actual bucket name
-
-const upload = multer({
-  storage: multer.memoryStorage(), // Store file in memory for quick upload to GCS
+// Initialize Google Cloud Storage
+const storage = new Storage({
+  keyFilename: path.join(__dirname, 'serviceaccountkey.json'), // Replace with the correct path
+  projectId: 'potato-books-437814', // Your Google Cloud project ID
 });
+const bucketName = 'potatobooks'; // Your GCS bucket name
 
+// Set up Multer for file uploads (if any)
+const upload = multer({ storage: multer.memoryStorage() });
+
+// Route to handle book submission
 app.post('/submit-book', upload.single('contentFile'), async (req, res) => {
   try {
-      const { title, author, genre, bookContent } = req.body; // Get text fields
-      const file = req.file; // Get the uploaded file
+    const { title, author, genre, summary, bookContent, yearPublished } = req.body; // Extract the text fields including summary
+    const file = req.file; // Extract the uploaded file (if any)
 
-      // 1. Upload text content (bookContent) as a separate file in GCS
-      const textFileName = `${title.replace(/\s+/g, '_')}_text.txt`; // Filename for text content
-      const textBlob = storage.bucket(bucketName).file(textFileName);
-      await textBlob.save(bookContent, {
-          resumable: false,
-          contentType: 'text/plain',
-      });
-      console.log('Text content uploaded successfully.');
+    // 1. Upload the Quill editor content (book text) to Google Cloud Storage
+    const textFileName = `${title.replace(/\s+/g, '_')}_content.txt`; // Create a unique filename for the text content
+    const textBlob = storage.bucket(bucketName).file(textFileName);
 
-      app.post('/submit-book', upload.single('contentFile'), async (req, res) => {
-        try {
-            const { title, author, genre, bookContent } = req.body; // Get text fields
-            const file = req.file; // Get the uploaded file
-    
-            // 1. Upload text content (bookContent) as a separate file in GCS
-            const textFileName = `${title.replace(/\s+/g, '_')}_text.txt`; // Filename for text content
-            const textBlob = storage.bucket(bucketName).file(textFileName);
-            await textBlob.save(bookContent, {
-                resumable: false,
-                contentType: 'text/plain',
-            });
-            console.log('Text content uploaded successfully.');
-    
-            // 2. If a file is uploaded, store the file in the bucket
-            if (file) {
-                const blob = storage.bucket(bucketName).file(file.originalname);
-                const blobStream = blob.createWriteStream({
-                    resumable: false,
-                });
-    
-                blobStream.on('error', (err) => {
-                    res.status(500).json({ error: 'Failed to upload file' });
-                });
-    
-                blobStream.on('finish', () => {
-                    res.status(200).json({
-                        message: 'Book submitted successfully',
-                        textFile: textFileName,
-                        uploadedFile: file.originalname,
-                    });
-                });
-    
-                blobStream.end(file.buffer);
-            } else {
-                res.status(200).json({
-                    message: 'Book submitted successfully with only text content',
-                    textFile: textFileName,
-                });
-            }
-        } catch (error) {
-            console.error('Error uploading book:', error);
-            res.status(500).json({ error: 'Failed to submit book' });
-        }
+    await textBlob.save(bookContent, {
+      resumable: false,
+      contentType: 'text/plain',
     });
+    console.log('Text content uploaded successfully to GCS.');
+
+    let uploadedFileName = '';
+    if (file) {
+      // 2. If a file is uploaded, save it to Google Cloud Storage
+      const fileBlob = storage.bucket(bucketName).file(file.originalname);
+      const blobStream = fileBlob.createWriteStream({
+        resumable: false,
+        contentType: file.mimetype, // Preserve the file's original type
+      });
+
+      blobStream.on('error', (err) => {
+        console.error('File upload failed:', err);
+        return res.status(500).json({ error: 'Failed to upload file to GCS.' });
+      });
+
+      blobStream.on('finish', () => {
+        console.log('File uploaded successfully to GCS.');
+      });
+
+      blobStream.end(file.buffer);
+      uploadedFileName = file.originalname; // Store uploaded file name for database insertion
+    }
+
+    // Insert book metadata into the BOOKS table with the genre_id and summary
+    const sql = `INSERT INTO BOOKS (TITLE, AUTHOR, GENRE_ID, SUMMARY, CONTENT_URL, PUBLISHED_YEAR) VALUES (?, ?, ?, ?, ?, ?)`;
+    const contentUrl = `https://storage.googleapis.com/${bucketName}/${textFileName}`;
+
+    connection.execute({
+      sqlText: sql,
+      binds: [title, author, genre, summary, contentUrl,yearPublished],
+      complete: function (err, stmt, rows) {
+        if (err) {
+          console.error('Error inserting book metadata:', err);
+          return res.status(500).json({ message: 'Error adding book to database.' });
+        } else {
+          console.log('Book metadata added to Snowflake.');
+          return res.status(201).json({
+            message: 'Book submitted successfully!',
+            textFileUrl: contentUrl,
+            uploadedFileName: uploadedFileName,
+          });
+        }
+      },
+    });
+  } catch (error) {
+    console.error('Error during book submission:', error);
+    return res.status(500).json({ error: 'Failed to submit book.' });
+  }
+});
 
 // Create a Snowflake connection configuration
 const connection = snowflake.createConnection({
@@ -86,7 +94,7 @@ const connection = snowflake.createConnection({
   warehouse: 'COMPUTE_WH',
   database: 'POTATOBOOKS',
   schema: 'POTATOSCHEMA',
-  role: 'ACCOUNTADMIN'
+  role: 'ACCOUNTADMIN',
 });
 
 // Connect to Snowflake
@@ -98,7 +106,7 @@ connection.connect((err, conn) => {
   }
 });
 
-// Fetch books from Snowflake (without Redis)
+// Fetch books from Snowflake
 app.get('/books', (req, res) => {
   const sql = `SELECT BOOK_ID, TITLE, PUBLISHED_YEAR FROM BOOKS`;
 
@@ -111,19 +119,19 @@ app.get('/books', (req, res) => {
       } else {
         res.json(rows); // Return books directly from Snowflake
       }
-    }
+    },
   });
 });
 
 // Add a new book to Snowflake
 app.post('/books', (req, res) => {
-  const { title, author, genre, contentUrl } = req.body;
+  const { title, author, genre, summary, contentUrl } = req.body;
 
-  const sql = `INSERT INTO BOOKS (TITLE, AUTHOR, GENRE, CONTENT_URL) VALUES (?, ?, ?, ?)`;
+  const sql = `INSERT INTO BOOKS (TITLE, AUTHOR, GENRE, SUMMARY, CONTENT_URL) VALUES (?, ?, ?, ?, ?)`;
 
   connection.execute({
     sqlText: sql,
-    binds: [title, author, genre, contentUrl],
+    binds: [title, author, genre, summary, contentUrl],
     complete: function (err, stmt, rows) {
       if (err) {
         console.error('Error adding book:', err);
@@ -132,7 +140,7 @@ app.post('/books', (req, res) => {
         console.log('Book added:', { title, author, genre });
         res.status(201).json({ message: 'Book added successfully' });
       }
-    }
+    },
   });
 });
 
@@ -172,9 +180,9 @@ app.get('/book/:bookId', (req, res) => {
           } else {
             res.status(404).json({ message: 'Book not found' });
           }
-        }
+        },
       });
-    }
+    },
   });
 });
 
@@ -195,10 +203,11 @@ app.get('/book/:bookId/page/:pageNumber', (req, res) => {
       } else {
         res.status(404).json({ message: 'Page not found' });
       }
-    }
+    },
   });
 });
 
+// Fetch genres
 app.get('/genres', (req, res) => {
   const sql = `SELECT GENRE_ID, GENRE_NAME FROM GENRES`;
 
@@ -211,7 +220,7 @@ app.get('/genres', (req, res) => {
       } else {
         res.json(rows); // Return the list of genres
       }
-    }
+    },
   });
 });
 

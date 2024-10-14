@@ -27,16 +27,16 @@
     </header>
 
     <section id="book-details" class="details-box">
-        <h2 id="book-title">Title: The Book Title</h2> <!-- Move title here -->
-        <p id="book-id"></p>
-        <p id="book-summary"></p>
-        <p id="book-page-count"></p>
-        <p id="book-view-count"></p> <!-- Element for displaying the view count -->
+        <h2 id="book-title">Title: The Book Title</h2> <!-- Title will be dynamically updated -->
+        <p id="book-id"></p> <!-- Book ID -->
+        <p id="book-summary"></p> <!-- Summary -->
+        <p id="book-page-count"></p> <!-- Page count -->
+        <p id="book-view-count"></p> <!-- View count will be displayed here -->
     </section>
 
     <section class="content-section" id="page-reader">
-        <h3 id="page-number">Page 1</h3>
-        <div id="page-content" class="page-content-box"></div>
+        <h3 id="page-number">Page 1</h3> <!-- Current page number will be displayed here -->
+        <div id="page-content" class="page-content-box"></div> <!-- Book content goes here -->
 
         <!-- Navigation buttons for previous and next pages -->
         <div class="navigation-buttons">
@@ -49,6 +49,7 @@
         <p>&copy; 2024 Potato Books. All rights reserved.</p>
     </footer>
 
+    <!-- Linking to the reader.js script that will handle the dynamic behavior -->
     <script src="/reader.js"></script>
 </body>
 </html>
