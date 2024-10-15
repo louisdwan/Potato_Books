@@ -22,69 +22,86 @@ const bucketName = 'potatobooks'; // Your GCS bucket name
 const upload = multer({ storage: multer.memoryStorage() });
 
 // Route to handle book submission
-app.post('/submit-book', upload.single('contentFile'), async (req, res) => {
+app.post('/submit-book', upload.fields([{ name: 'contentFile' }, { name: 'thumbnail' }]), async (req, res) => {
   try {
-    const { title, author, genre, summary, bookContent, yearPublished } = req.body; // Extract the text fields including summary
-    const file = req.file; // Extract the uploaded file (if any)
+      const { title, author, genre, summary, bookContent, yearPublished } = req.body; // Extract the text fields including summary
+      const contentFile = req.files['contentFile'] ? req.files['contentFile'][0] : null;
+      const thumbnailFile = req.files['thumbnail'] ? req.files['thumbnail'][0] : null;
 
-    // 1. Upload the Quill editor content (book text) to Google Cloud Storage
-    const textFileName = `${title.replace(/\s+/g, '_')}_content.txt`; // Create a unique filename for the text content
-    const textBlob = storage.bucket(bucketName).file(textFileName);
+      // 1. Upload the Quill editor content (book text) to Google Cloud Storage
+      const textFileName = `${title.replace(/\s+/g, '_')}_content.txt`; // Create a unique filename for the text content
+      const textBlob = storage.bucket(bucketName).file(textFileName);
 
-    await textBlob.save(bookContent, {
-      resumable: false,
-      contentType: 'text/plain',
-    });
-    console.log('Text content uploaded successfully to GCS.');
-
-    let uploadedFileName = '';
-    if (file) {
-      // 2. If a file is uploaded, save it to Google Cloud Storage
-      const fileBlob = storage.bucket(bucketName).file(file.originalname);
-      const blobStream = fileBlob.createWriteStream({
-        resumable: false,
-        contentType: file.mimetype, // Preserve the file's original type
+      await textBlob.save(bookContent, {
+          resumable: false,
+          contentType: 'text/plain',
       });
+      console.log('Text content uploaded successfully to GCS.');
 
-      blobStream.on('error', (err) => {
-        console.error('File upload failed:', err);
-        return res.status(500).json({ error: 'Failed to upload file to GCS.' });
-      });
-
-      blobStream.on('finish', () => {
-        console.log('File uploaded successfully to GCS.');
-      });
-
-      blobStream.end(file.buffer);
-      uploadedFileName = file.originalname; // Store uploaded file name for database insertion
-    }
-
-    // Insert book metadata into the BOOKS table with the genre_id and summary
-    const sql = `INSERT INTO BOOKS (TITLE, AUTHOR, GENRE_ID, SUMMARY, CONTENT_URL, PUBLISHED_YEAR) VALUES (?, ?, ?, ?, ?, ?)`;
-    const contentUrl = `https://storage.googleapis.com/${bucketName}/${textFileName}`;
-
-    connection.execute({
-      sqlText: sql,
-      binds: [title, author, genre, summary, contentUrl,yearPublished],
-      complete: function (err, stmt, rows) {
-        if (err) {
-          console.error('Error inserting book metadata:', err);
-          return res.status(500).json({ message: 'Error adding book to database.' });
-        } else {
-          console.log('Book metadata added to Snowflake.');
-          return res.status(201).json({
-            message: 'Book submitted successfully!',
-            textFileUrl: contentUrl,
-            uploadedFileName: uploadedFileName,
+      let uploadedFileName = '';
+      if (contentFile) {
+          // 2. If a file is uploaded, save it to Google Cloud Storage
+          const fileBlob = storage.bucket(bucketName).file(contentFile.originalname);
+          const blobStream = fileBlob.createWriteStream({
+              resumable: false,
+              contentType: contentFile.mimetype, // Preserve the file's original type
           });
-        }
-      },
-    });
+
+          blobStream.on('error', (err) => {
+              console.error('File upload failed:', err);
+              return res.status(500).json({ error: 'Failed to upload file to GCS.' });
+          });
+
+          blobStream.on('finish', () => {
+              console.log('File uploaded successfully to GCS.');
+          });
+
+          blobStream.end(contentFile.buffer);
+          uploadedFileName = contentFile.originalname; // Store uploaded file name for database insertion
+      }
+
+      // 3. Upload the thumbnail if provided
+      let thumbnailUrl = '';
+      if (thumbnailFile) {
+          const thumbnailFileName = `${title.replace(/\s+/g, '_')}_thumbnail.${thumbnailFile.originalname.split('.').pop()}`;
+          const thumbnailBlob = storage.bucket(bucketName).file(thumbnailFileName);
+
+          await thumbnailBlob.save(thumbnailFile.buffer, {
+              resumable: false,
+              contentType: thumbnailFile.mimetype,
+          });
+          thumbnailUrl = `https://storage.googleapis.com/${bucketName}/${thumbnailFileName}`;
+          console.log('Thumbnail uploaded successfully to GCS.');
+      }
+
+      // 4. Insert book metadata into the BOOKS table with the thumbnail URL
+      const sql = `INSERT INTO BOOKS (TITLE, AUTHOR, GENRE_ID, SUMMARY, CONTENT_URL, THUMBNAIL_URL, PUBLISHED_YEAR) VALUES (?, ?, ?, ?, ?, ?, ?)`;
+      const contentUrl = `https://storage.googleapis.com/${bucketName}/${textFileName}`;
+
+      connection.execute({
+          sqlText: sql,
+          binds: [title, author, genre, summary, contentUrl, thumbnailUrl, yearPublished],
+          complete: function (err, stmt, rows) {
+              if (err) {
+                  console.error('Error inserting book metadata:', err);
+                  return res.status(500).json({ message: 'Error adding book to database.' });
+              } else {
+                  console.log('Book metadata added to Snowflake.');
+                  return res.status(201).json({
+                      message: 'Book submitted successfully!',
+                      textFileUrl: contentUrl,
+                      thumbnailUrl: thumbnailUrl,
+                      uploadedFileName: uploadedFileName,
+                  });
+              }
+          },
+      });
   } catch (error) {
-    console.error('Error during book submission:', error);
-    return res.status(500).json({ error: 'Failed to submit book.' });
+      console.error('Error during book submission:', error);
+      return res.status(500).json({ error: 'Failed to submit book.' });
   }
 });
+
 
 // Create a Snowflake connection configuration
 const connection = snowflake.createConnection({

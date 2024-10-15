@@ -130,3 +130,20 @@ footer {
     color: white;
     margin-top: 2rem;
 }
+
+.thumbnail-container {
+    width: 150px; /* Adjust as needed */
+    height: 200px; /* Adjust as needed */
+    margin: 0 auto; /* Center the image */
+    text-align: center;
+    float: left; /* Float to the left */
+    margin-right: 20px; /* Add some space between the thumbnail and the text */
+}
+
+.thumbnail {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: cover;
+    border: 1px solid #ccc;
+}
+

@@ -99,3 +99,12 @@ nav ul li a {
     text-decoration: none;
     padding: 10px;
 }
+
+#summary {
+    
+    height: 25px; /* Set initial height to match a single line */
+    resize: vertical; /* Allow the user to resize the height */
+    overflow: hidden; /* Hide any overflow text */
+    padding: 8px; /* Optional padding for better appearance */
+    box-sizing: border-box; /* Include padding in the element's total width and height */
+}

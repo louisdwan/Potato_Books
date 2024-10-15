@@ -5,32 +5,38 @@ document.addEventListener('DOMContentLoaded', function () {
     let totalPages = 0;
     let bookData = {}; // To store the book metadata and pages
 
-    // Fetch the book details and content URL from the backend using the bookId
-    fetch(`http://localhost:5000/book/${bookId}`)
-        .then(response => response.json())
-        .then(book => {
-            if (book) {
-                bookData = book;
-                totalPages = book.PAGE_COUNT || 1; // Set total pages, default to 1 if missing
-                displayBookDetails(book); // Display book information
-                loadBookContent(book.CONTENT_URL); // Load the content from the bucket URL
-            } else {
-                document.getElementById('book-details').textContent = "Book not found.";
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching book:', error);
-            document.getElementById('book-details').textContent = "Error loading book details.";
-        });
+   // Fetch the book details and content URL from the backend using the bookId
+// Fetch the book details and content URL from the backend using the bookId
+fetch(`http://localhost:5000/book/${bookId}`)
+    .then(response => response.json())
+    .then(book => {
+        if (book) {
+            bookData = book;
+            totalPages = book.PAGE_COUNT || 1; // Set total pages, default to 1 if missing
+            displayBookDetails(book); // Display book information
+            loadBookContent(book.CONTENT_URL); // Load the content from the bucket URL
+        } else {
+            document.getElementById('book-details').textContent = "Book not found.";
+        }
+    })
+    .catch(error => {
+        console.error('Error fetching book:', error);
+        document.getElementById('book-details').textContent = "Error loading book details.";
+    });
 
-    // Display the book details (ID, Title, Summary, Page Count, View Count)
-    function displayBookDetails(book) {
-        document.getElementById('book-id').textContent = `Book ID: ${book.BOOK_ID}`;
-        document.getElementById('book-title').textContent = `Title: ${book.TITLE}`;
-        document.getElementById('book-summary').textContent = `Summary: ${book.SUMMARY || 'No summary available.'}`;
-        document.getElementById('book-page-count').textContent = `Page Count: ${book.PAGE_COUNT || 'N/A'}`;
-        document.getElementById('book-view-count').textContent = `Views: ${book.VIEW_COUNT}`; // Display the view count
-    }
+// Display the book details (ID, Title, Summary, Page Count, View Count, Thumbnail)
+function displayBookDetails(book) {
+    document.getElementById('book-id').textContent = `Book ID: ${book.BOOK_ID}`;
+    document.getElementById('book-title').textContent = `Title: ${book.TITLE}`;
+    document.getElementById('book-summary').textContent = `Summary: ${book.SUMMARY || 'No summary available.'}`;
+    document.getElementById('book-page-count').textContent = `Page Count: ${book.PAGE_COUNT || 'N/A'}`;
+    document.getElementById('book-view-count').textContent = `Views: ${book.VIEW_COUNT}`; // Display the view count
+
+    // Set the thumbnail image, or use a placeholder if not available
+    const thumbnailElement = document.getElementById('thumbnail-image');
+    thumbnailElement.src = book.THUMBNAIL_URL || './resources/images/placeholder-thumbnail.png';
+    thumbnailElement.alt = `Thumbnail for ${book.TITLE}`;
+}
 
     // Load the book content from the Google Cloud Storage URL
     function loadBookContent(contentUrl) {
@@ -73,7 +79,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function loadPage(pageNumber, pages) {
         if (pages && pages[pageNumber - 1]) {
             document.getElementById('page-number').textContent = `Page ${pageNumber}`;
-            document.getElementById('page-content').textContent = pages[pageNumber - 1];
+            document.getElementById('page-content').innerHTML = pages[pageNumber - 1];
         } else {
             document.getElementById('page-content').textContent = "Page not found.";
         }
